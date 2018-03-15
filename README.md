@@ -40,7 +40,7 @@
 ### Step 1
 ```sh
 ## 1. clone the repo
-git clone --depth 1 https://github.com/afaqurk/linux-dash.git
+git clone --depth 1 https://github.com/tjosgood/linux-dash.git
 
 ## 2. go to the cloned directory
 cd linux-dash/app/server
@@ -50,7 +50,7 @@ OR, if you prefer to download manually:
 
 ```sh
 ## 1. Download the .zip
-curl -LOk https://github.com/afaqurk/linux-dash/archive/master.zip && unzip master.zip
+curl -LOk https://github.com/tosgood/linux-dash/archive/master.zip && unzip master.zip
 
 ## 2. navigate to downloaded & unzipped dir
 cd linux-dash-master/app/server
@@ -89,7 +89,7 @@ To build a binary, run `go build && ./server -h`. See [@tehbilly](https://github
 #### If Using Python
 ```sh
 # Start the server (on port 80 by default; may require sudo).
-python index.py
+python index.py --port 8900
 ```
 
 #### If Using PHP
