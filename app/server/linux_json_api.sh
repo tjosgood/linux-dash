@@ -12,7 +12,7 @@ PS=$(type -P ps)
 
 _parseAndPrint() {
   while read data; do
-    $ECHO -n "$data" | $SED -r "s/\"/\\\\\"/g" | $TR -d "\n";
+    $ECHO -n "$data" | $SED -r 's/\\//g' | $TR -d "\n";
   done;
 }
 
@@ -84,29 +84,11 @@ cpu_intensive_processes() {
 }
 
 cpu_temp() {
-  local ID=*
-  [ -f /etc/os-release  ] && source /etc/os-release
-  case "$ID" in
-    "raspbian")
-      cpu=$(</sys/class/thermal/thermal_zone0/temp)
-      echo "$((cpu/1000))" | _parseAndPrint
-    ;;
-    *)
-      if type -P sensors 2>/dev/null; then
-        returnString=`sensors`
-        #amd
-        if [[ "${returnString/"k10"}" != "${returnString}" ]] ; then
-          $ECHO ${returnString##*k10} | $CUT -d ' ' -f 6 | $CUT -c 2- | $CUT -c 1-4
-        #intel
-        elif [[ "${returnString/"core"}" != "${returnString}" ]] ; then
-          fromcore=${returnString##*"coretemp"}
-          $ECHO ${fromcore##*Physical}  | $CUT -d ' ' -f 3 | $CUT -c 2-5 | _parseAndPrint
-        fi
-      else
-        $ECHO "[]" | _parseAndPrint
-      fi
-    ;;
-  esac
+	returnString=`sensors`
+	avg=$(echo "$returnString" | grep "Core " | sed 's/[+|°C]//g;' | awk 'BEGIN{s=0;i=1;} {for (; i <= FNR; i++) ;s = s+$3 }; END { i--;print s/i }')
+	maxt=$(echo "$returnString" | grep "Core " | sed 's/[+|°C]//g;' | awk 'BEGIN{s=0;i=1;} {for (; i <= FNR; i++) ;if($3 > s){s = $3}; }; END { print s }')
+
+	$ECHO "{\"Average\" : $avg, \"Max\" : $maxt  }" | _parseAndPrint
 }
 
 # by Paul Colby (http://colby.id.au), no rights reserved ;)
@@ -312,6 +294,37 @@ load_avg() {
 
   result=$($CAT /proc/loadavg | $AWK '{print "{ \"1_min_avg\": " ($1*100)/'$numberOfCores' ", \"5_min_avg\": " ($2*100)/'$numberOfCores' ", \"15_min_avg\": " ($3*100)/'$numberOfCores' "}," }')
 
+  $ECHO ${result%?} | _parseAndPrint
+}
+
+gpu_temp() {
+  pre=$( nvidia-smi --query-gpu=index,name,temperature.gpu --format=csv,noheader )
+  result=$(echo "$pre" | $AWK -F',' '{print " \" " substr($2, 0,15) " " $1 " \": " $3 "," }')
+  result="{${result::-1}} "
+  $ECHO ${result%?} | _parseAndPrint
+}
+
+gpu_util() {
+  pre=$( nvidia-smi --query-gpu=index,name,utilization.gpu --format=csv,noheader )
+  pre=${pre//"%"/}
+  result=$(echo "$pre" | $AWK -F',' '{print " \" " substr($2, 0,15) " " $1 " \": " $3 "," }')
+  result="{${result::-1}} "
+  $ECHO ${result%?} | _parseAndPrint
+}
+
+gpu_mem() {
+  pre=$( nvidia-smi --query-gpu=index,name,memory.used,memory.total --format=csv,noheader )
+  pre=${pre//"MiB"/}
+  result=$(echo "$pre" | $AWK -F',' '{print " \" " substr($2, 0,15) " " $1 " \": " ($3/$4)*100 "," }')
+  result="{${result::-1}} "
+  $ECHO ${result%?} | _parseAndPrint
+}
+
+gpu_power() {
+  pre=$( nvidia-smi --query-gpu=index,name,power.draw,power.limit, --format=csv,noheader )
+  pre=${pre//"W"/}
+  result=$(echo "$pre" | $AWK -F',' '{print " \" " substr($2, 0,15) " " $1 " \": " $3 "," }')
+  result="{${result::-1}} "
   $ECHO ${result%?} | _parseAndPrint
 }
 

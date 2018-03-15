@@ -23,10 +23,14 @@ function routesFn($routeProvider) {
 
     .when('/system-status', {
       template: [
-        '<ram-chart sortablejs-id="ram-chart"></ram-chart> ',
         '<cpu-avg-load-chart sortablejs-id="cpu-avg-load-chart"></cpu-avg-load-chart> ',
-        '<cpu-utilization-chart sortablejs-id="cpu-util-chart"></cpu-utilization-chart> ',
         '<cpu-temp sortablejs-id="cpu-temp"></cpu-temp> ',
+        '<gpu-util sortablejs-id="gpu-util"></gpu-util> ',
+        '<gpu-temp sortablejs-id="gpu-temp"></gpu-temp> ',
+        '<cpu-utilization-chart sortablejs-id="cpu-util-chart"></cpu-utilization-chart> ',
+        '<ram-chart sortablejs-id="ram-chart"></ram-chart> ',
+        '<gpu-mem sortablejs-id="gpu-mem"></gpu-mem> ',
+        '<gpu-power sortablejs-id="gpu-power"></gpu-power> ',
         '<ram-intensive-processes sortablejs-id="ram-intensive-processes"></ram-intensive-processes> ',
         '<cpu-intensive-processes sortablejs-id="cpu-intensive-processes"></cpu-intensive-processes> ',
         '<disk-space sortablejs-id="disk-space"></disk-space> ',
