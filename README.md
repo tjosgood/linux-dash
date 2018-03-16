@@ -89,7 +89,7 @@ To build a binary, run `go build && ./server -h`. See [@tehbilly](https://github
 #### If Using Python
 ```sh
 # Start the server (on port 80 by default; may require sudo).
-python index.py --port 8900
+nohup python2 /home/tosgood/linux-dash/app/server/index.py --port 8900 &
 ```
 
 #### If Using PHP
