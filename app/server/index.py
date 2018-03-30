@@ -72,10 +72,6 @@ def all_stats():
     res = get_nvidia_smi("gpu_all")
 
     info = call_bash("load_avg")
-    for k,v in info.items():
-        res["cpu_"+k] = v
-
-    info = call_bash("load_avg")
     for k, v in info.items():
         res["cpu_load_" + k.lower()] = v
 
@@ -87,6 +83,7 @@ def all_stats():
     for k, v in info.items():
         res["ram_" + k.lower()] = v
 
+    res["name"] = subprocess.check_output(["hostname",]).strip()
     return res
 
 
